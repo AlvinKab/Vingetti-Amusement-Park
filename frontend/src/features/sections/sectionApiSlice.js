@@ -1,12 +1,11 @@
 import {
-    createSelector,
     createEntityAdapter
 } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/api"
 
-const usersAdapter = createEntityAdapter({})
+const sectionsAdapter = createEntityAdapter({})
 
-const initialState = usersAdapter.getInitialState()
+const initialState = sectionsAdapter.getInitialState()
 
 export const SectionApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -18,7 +17,7 @@ export const SectionApiSlice = apiSlice.injectEndpoints({
                 },
             }),
             transformResponse: responseData => {
-                const loadedUsers = responseData.map(section => {
+                const loadedSections = responseData.map(section => {
                     section.id = section._id
                     return section
                 });
@@ -49,7 +48,7 @@ export const SectionApiSlice = apiSlice.injectEndpoints({
                 method: 'PATCH',
                 body: { ...prevSectionInfo }
             }),
-            invalidatesTags: [
+            invalidatesTags: (result, error, arg) => [
                 { type: 'Section', id: arg.id}
             ]
         }),
@@ -58,7 +57,10 @@ export const SectionApiSlice = apiSlice.injectEndpoints({
                 url: '/sections',
                 method: 'DELETE',
                 body: { id }
-            })
+            }),
+            invalidatesTags: (result, error, arg) => [
+                { type: 'Section', id: arg.id}
+            ]
         })
     })
 })

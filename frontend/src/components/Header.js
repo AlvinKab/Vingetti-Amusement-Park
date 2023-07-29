@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom'
 const Header = () => {
     const content = (
         <header>
-            <Link to='/customers/new'></Link>
-            <Link to='/sections/get'></Link>
-            <Link to='/customers/update'></Link>
-            <Link to='/customers'></Link>
-            <Link to='/sections'></Link>
+            <Link to='/customers/new'>Ticket</Link>
+            <Link to='/sections/get'>Sections</Link>
+            <Link to='/customers'>All customers</Link>
+            <Link to='/sections'>All sections</Link>
         </header>
     )
 

@@ -1,10 +1,25 @@
-const AllSections = () => {
+import { useGetAllSectionsQuery } from "./sectionApiSlice"
+import { useDeleteOneSectionMutation } from "./sectionApiSlice"
+
+const AllSections = ({ sectionId }) => {
+    const { section } = useGetAllSectionsQuery('sectionsList', {
+        selectFromResult: ({ data }) => ({
+            section: data?.entities[sectionId]
+        })
+    })
+
+    const [deleteSection] = useDeleteOneSectionMutation()
+
+    const onDeleteSectionClicked = async () => {
+        await deleteSection({id :section.id})
+    }
+
     const content = (
         <div className="section-info">
-            <p>Section name: {}</p>
-            <p>Dimensions(metres): {}</p>
-            <p>Price: {}</p>
-            <span><button>delete</button></span>
+            <p>Section name: {section.sectionName}</p>
+            <p>Dimensions(metres): {section.dimensions}</p>
+            <p>Price: {section.price}</p>
+            <span><button onClick={onDeleteSectionClicked}>delete</button></span>
         </div>
     )
 

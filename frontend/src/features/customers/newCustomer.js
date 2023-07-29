@@ -1,16 +1,30 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useCreateNewCustomerMutation } from './customerApiSlice'
 
-const FIRSTNAME_REGEX = /^[A-Z]{2,10}$/
-const SURNAME_REGEX = /^[A-Z]{2,10}$/
+const FIRSTNAME_REGEX = /^[A-z]{2,10}$/
+const SURNAME_REGEX = /^[A-z]{2,10}$/
 
 const NewCustomerTicket = () => {
     const randomID = Math.floor(Math.random() * 9000000) + 1000000
 
+    const [addNewCustomer, {
+        isLoading,
+        isSuccess,
+        isError,
+        error
+    }] = useCreateNewCustomerMutation()
+
+    let content
+
+    if (isLoading) content = <div className="loading-screen"/>
+
+    const navigate = useNavigate()
+
     const [firstName, setFirstName] = useState('')
     const [surname, setSurname] = useState('')
     const [validFirstName, setValidFirstName] = useState(false)
-    const [validSurame, setValidSurame] = useState(false)
+    const [validSurname, setValidSurame] = useState(false)
     const [paid, setPaid] = useState(false)
 
     useEffect(() => {
@@ -21,6 +35,14 @@ const NewCustomerTicket = () => {
         setValidSurame(SURNAME_REGEX.test(surname))
     }, [surname])
 
+    useEffect(() => {
+        if (isSuccess) {
+            setFirstName('')
+            setSurname('')
+            navigate('/customers/new')
+        }
+    }, [isSuccess, navigate])
+
     const onFirstNameChanged = e => setFirstName(e.target.value)
     const onSurnameChanged = e => setSurname(e.target.value)
 
@@ -28,7 +50,8 @@ const NewCustomerTicket = () => {
         setPaid(prevPaid => !prevPaid)
     }
 
-    const saved = [randomID, firstName, surname].every(Boolean)
+    const saved = [randomID, validFirstName, validSurname].every(Boolean)
+
     const onSaveCustomer = async (e) => {
         e.preventDefault()
         if (saved) {
@@ -36,8 +59,14 @@ const NewCustomerTicket = () => {
         }
     }
 
-    const content = (
+    const errClass = isError? "error" : "offscreen"
+    const validFirstNameClass = !validFirstName? "-invalid" : ""
+    const validSurnameClass = !validSurname? "-invalid" : ""
+
+    content = (
         <>
+            <p className={errClass}>{error?.data?.message}</p>
+
             <div className="banner">
                 <div className="logo"/>
                 <div className="name">
@@ -57,22 +86,26 @@ const NewCustomerTicket = () => {
                         readOnly value={randomID}
                     />
                 </div>
-                <div className="sameline">
+                <div className="same-line">
                     <label>First Name: </label>
                     <input
+                        className={`form-input${validFirstNameClass}`}
                         id="firstName"
                         name="firstName"
                         type="text"
                         value={firstName}
+                        onChange={onFirstNameChanged}
                     />
                 </div>
-                <div className="sameline">
+                <div className="same-line">
                     <label>Surname: </label>
                     <input
+                        className={`form-input${validSurnameClass}`}
                         id="Surname"
                         name="Surname"
                         type="text"
                         value={surname}
+                        onChange={onSurnameChanged}
                     />
                 </div>
                 <div className="same-line">
@@ -81,11 +114,12 @@ const NewCustomerTicket = () => {
                         id="date"
                         name="date"
                         type="date"
-                        readOnly value={`${getFullYear()}/${getMonth() + 1}/${getDate()}`}
+                        readOnly value={`${new Date().getFullYear()}/${new Date().getMonth() + 1}/${new Date().getDate()}`}
                     />
                 </div>
                 <div className="same-line">
                     <p>Fee: Kshs.1000</p>
+                    <br/>
                     <p>Paybill No: 282 7245</p>
                 </div>
                 <div className="same-line">
@@ -102,6 +136,8 @@ const NewCustomerTicket = () => {
             </form>
         </>
     )
+
+    return content
 }
 
 export default NewCustomerTicket

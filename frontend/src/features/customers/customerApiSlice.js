@@ -1,12 +1,11 @@
 import {
-    createSelector,
     createEntityAdapter
 } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/api"
 
-const usersAdapter = createEntityAdapter({})
+const customersAdapter = createEntityAdapter({})
 
-const initialState = usersAdapter.getInitialState()
+const initialState = customersAdapter.getInitialState()
 
 export const CustomerApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -18,7 +17,7 @@ export const CustomerApiSlice = apiSlice.injectEndpoints({
                 },
             }),
             transformResponse: responseData => {
-                const loadedUsers = responseData.map(customer => {
+                const loadedCustomers = responseData.map(customer => {
                     customer.id = customer._id
                     return customer
                 });
@@ -49,7 +48,7 @@ export const CustomerApiSlice = apiSlice.injectEndpoints({
                 method: 'PATCH',
                 body: { ...prevCustomerInfo }
             }),
-            invalidatesTags: [
+            invalidatesTags: (result, error, arg) => [
                 { type:'Customer', id: arg.id }
             ]
         }),
@@ -58,7 +57,10 @@ export const CustomerApiSlice = apiSlice.injectEndpoints({
                 url: '/customers',
                 method: 'DELETE',
                 body: { id }
-            })
+            }),
+            invalidatesTags: (result, error, arg) => [
+                { type:'Customer', id: arg.id }
+            ]
         })
     })
 })

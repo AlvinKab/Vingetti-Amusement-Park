@@ -1,22 +1,27 @@
-const AllCustomers = () => {
+import { useGetAllCustomersQuery } from "./customerApiSlice"
+import { useDeleteOneCustomerMutation } from "./customerApiSlice"
+
+const AllCustomers = ({ customerId }) => {
+    const { customer } = useGetAllCustomersQuery('customersList', {
+        selectFromResult: ({ data }) => ({
+            customer: data?.entities[customerId]
+        })
+    })
+
+    const [deleteCustomer] = useDeleteOneCustomerMutation()
+
+    const onDeleteCustomerClicked = async () => {
+        await deleteCustomer({id :customer.id})
+    }
+
     const content = (
         <>
-            <div>
-                <div className="searchbar">
-                    {/* Look up how to create a searchbar in a full MERN stack */}
-                </div>
-                <div className="delete-old">
-                    <button>
-                        
-                    </button>
-                </div>
-            </div>
             <div className="customer-info">
-                <p>Random ID: {}</p>
-                <p>Name: {} {}</p>
-                <p>Sections visited: {}</p>
-                <p>{/* date */}</p>
-                <span><button>delete</button></span>
+                <p>Random ID: {customer.randomID}</p>
+                <p>Name: {customer.firstName} {}</p>
+                <p>Sections visited: {customer.section}</p>
+                <p>{customer.date}</p>
+                <span><button onClick={onDeleteCustomerClicked}>delete</button></span>
             </div>
         </>
     )
